@@ -257,11 +257,22 @@ forcing_data_full <- map_dfr(forcing_files, forcefile_reader)
 ## Make line plot of mean temperature by year by site 
 
 ```{r}
+library(ggthemes)
+
 # Create data frame with mean air temperature by year by site 
 
+temp_yearly <- forcing_data_full %>% 
+  group_by(year,site) %>% 
+  summarize(mean_yrtemp = mean(airtemp, na.rm=T))
+
 # Make line plot of mean temperature by year by site 
-# ggplot()+
-#   geom_line()
+
+ggplot(temp_yearly, aes(x=year, y=mean_yrtemp, color=site))+
+  geom_line()+ 
+  theme_few()+ 
+  scale_color_manual(name="Site", values= c("#274a12","#babf28"))+ 
+  labs(x='Year', y='Average Air Temperature')+ 
+  xlim(2001,2012)
 ```
 
 
@@ -270,11 +281,28 @@ forcing_data_full <- map_dfr(forcing_files, forcefile_reader)
 Hint: https://ggplot2.tidyverse.org/reference/print.ggplot.html
 
 
-## Create function for line plots of monthly average temperature at each site per year
+## Create function to make line plots of monthly average temperature at each site per year
 
 ```{r}
+# Create data frame for monthly average temp per year per site 
+temp_monthly <- forcing_data_full %>% 
+  group_by(year, month, site)%>% 
+  summarize(mean_motemp=mean(airtemp, na.rm=T))
+
+ggplot(temp_monthly,aes(x=year,y=mean_motemp,color=site))+
+    geom_line()
+
 # Write function to make line plots of monthly average temps per site per year 
+years = list[]
+line_plotter <- function(year){
+  ggplot(temp_monthly,aes(x=year,y=mean_notemp,color=site))+
+    geom_line()
+}
+
 # Use for loop to plot years 2005 to 2010
+# for (i in (years)){
+#   
+# }
 ```
 
 
@@ -285,7 +313,16 @@ Bonus: Make a plot of average daily precipitation by day of year (averaged acros
 ## Create a plot of average daily precip by day of year, distinguishing between sites 
 
 ```{r}
+library(tidyr)
 
+# Create data frame with mean daily precip by day of year
+precip_daily <- forcing_data_full %>% 
+  tidyr::unite(DOM,c(month,day), sep="-", remove=FALSE) %>% 
+  group_by(month,day,site)%>% 
+  summarize(mean_precip= mean(precip, na.rm=T))
+
+# ggplot(precip_daily)
+  
 ```
 
 
