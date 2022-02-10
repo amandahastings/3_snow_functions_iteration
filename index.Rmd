@@ -308,23 +308,20 @@ line_plotter <- function(df, year) {
   temp_monthly <- df %>%
     group_by(year, month, site) %>%
     summarize(mean_motemp = mean(airtemp, na.rm = T)) %>%
-    filter(yr == year)
+    filter(i == year)
   
-  plot <-
-    ggplot(temp_monthly, aes(x = month, y = mean_motemp, color = site)) +
+    print(ggplot(temp_monthly, aes(x = month, y = mean_motemp, color = site)) +
     geom_line() +
     theme_few() +
-    labs(x = 'Month', y = 'Average Air Temperature', title = yr)
+    labs(x = 'Month', y = 'Average Air Temperature', title = i))
   
-  print(plot)
 }
 
 # Use for loop to plot years 2005 to 2010
 
+yrs = c(2005:2010)
 
-yrs = c(2005,2006,2007,2008,2009,2010)
-
-for (yr in yrs){
+for (i in yrs){
   line_plotter(forcing_data_full,year)
 }
 
@@ -337,15 +334,29 @@ Bonus: Make a plot of average daily precipitation by day of year (averaged acros
 ### Create a plot of average daily precip by day of year
 
 ```{r}
-library(tidyr)
 
 # Create data frame with mean daily precip by day of year
+# Create time series (xaxis = DoM)
+
+library(dygraphs)
+library(xts)
+
 precip_daily <- forcing_data_full %>% 
   group_by(month,day,site)%>% 
-  mutate(DoM = paste(month,day,sep='-')) %>%
-  summarize(mean_precip= mean(precip, na.rm=T))
+  summarize(mean_precip= mean(precip, na.rm=T)) %>% 
+  mutate(DoM = paste(month,day,sep='-'))%>% 
+  pivot_wider(names_from = site,values_from=mean_precip)%>% 
+  select(-SBSP)
 
-# ggplot(precip_daily)
+precip_xts <- xts(precip_daily%>% 
+                    select(SASP), order.by=precip_daily$DoM)
+
+str(precip_xts)
+
+ggplot(precip_daily, aes(x = DoM, y = SASP)) +
+    geom_point() +
+    theme_few() +
+    labs(x = 'Day of Year', y = 'Average Precipitation')
   
 ```
 
