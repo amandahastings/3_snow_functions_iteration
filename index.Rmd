@@ -216,7 +216,6 @@ headers
 
 # Write a function to read in the data and append site column 
 
-#### Is this next code necessary? 
 forcing_files <- filenames2  
 #   .[!grepl('24hr',.)]
 # forcing_files
@@ -285,7 +284,7 @@ temp_yearly <- forcing_data_full %>%
 ggplot(temp_yearly, aes(x=year, y=mean_yrtemp, color=site))+
   geom_line()+ 
   theme_few()+ 
-  scale_color_manual(name="Site", values= c("#274a12","#babf28"))+ 
+  scale_color_manual(name="Site", values= c("#58A3EB","#58E8EB"))+ 
   labs(x='Year', y='Average Air Temperature')
 ```
 
@@ -333,6 +332,8 @@ Bonus: Make a plot of average daily precipitation by day of year (averaged acros
 
 ### Create a plot of average daily precip by day of year
 
+** Still working on this **
+
 ```{r}
 
 # Create data frame with mean daily precip by day of year
@@ -340,21 +341,24 @@ Bonus: Make a plot of average daily precipitation by day of year (averaged acros
 
 library(dygraphs)
 library(xts)
+library(lubridate)
 
 precip_daily <- forcing_data_full %>% 
   group_by(month,day,site)%>% 
   summarize(mean_precip= mean(precip, na.rm=T)) %>% 
-  mutate(DoM = paste(month,day,sep='-'))%>% 
+  mutate(date = paste(month,day, sep= "/"))%>% 
   pivot_wider(names_from = site,values_from=mean_precip)%>% 
   select(-SBSP)
 
-precip_xts <- xts(precip_daily%>% 
-                    select(SASP), order.by=precip_daily$DoM)
+# precip_daily$date <- as.Date(precip_daily$date)
+#   
+# precip_xts <- xts(precip_daily%>% 
+#                     select(SASP), order.by=precip_daily$Date)
+# 
+# str(precip_xts)
 
-str(precip_xts)
-
-ggplot(precip_daily, aes(x = DoM, y = SASP)) +
-    geom_point() +
+ggplot(precip_daily, aes(x = date, y = SASP)) +
+    geom_point(shape=1) +
     theme_few() +
     labs(x = 'Day of Year', y = 'Average Precipitation')
   
@@ -365,7 +369,7 @@ ggplot(precip_daily, aes(x = DoM, y = SASP)) +
 Bonus #2: Use a function and for loop to create yearly plots of precipitation by day of year.
 
 
-## Create yearly plots of precip by day of year 
+### Create yearly plots of precip by day of year 
 
 ```{r}
 
