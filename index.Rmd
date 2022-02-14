@@ -334,7 +334,28 @@ Bonus: Make a plot of average daily precipitation by day of year (averaged acros
 
 ```{r}
 
-# Create data frame with mean daily precip by day of year using dygraphs
+# Create plot with mean daily precip by day of year using ggplot
+
+precip_daily <- forcing_data_full %>%
+  group_by(month, day, year, site) %>%
+  summarize(mean_precip = mean(precip, na.rm = T)) %>%
+  mutate(date = as.Date(paste(year, month, day, sep = "/"))) %>%
+  mutate(yday = yday(date)) %>%
+  pivot_wider(names_from = site, values_from = mean_precip) %>%
+  select(-SBSP)%>% 
+  group_by(yday)%>% 
+  summarize(mean_dy_precip = mean(SASP))
+
+ggplot(precip_daily, aes(x = yday, y = mean_dy_precip)) +
+    geom_point(shape=1) +
+    theme_few() +
+    labs(x = 'Day of Year', y = 'Average Precipitation')
+
+# Create plot with mean daily precip by day of year using dygraphs
+
+library(dygraphs)
+library(xts)
+library(lubridate)
 
 precip_daily2 <- forcing_data_full %>%
   group_by(month, day, year, site) %>%
@@ -350,23 +371,6 @@ precip_xts2 <- xts(precip_daily2 %>%
 dygraph(precip_xts2, ylab = "Average Daily Precipitation") %>%
   dyOptions(fillGraph = TRUE)
 
-# precip_daily <-  %>% 
-#   group_by(month,day, site)%>% 
-#   summarize(mean_precip= mean(precip, na.rm=T)) %>%
-#   mutate(DoM = paste(month,day, sep= "/"))%>% 
-#   pivot_wider(names_from = site,values_from=mean_precip)%>% 
-#   select(-SBSP)
-# 
-# # lubridate: day of year - yday
-# 
-# # make_date 
-# 
-# ggplot(precip_daily, aes(x = DoM, y = SASP)) +
-#     geom_point(shape=1) +
-#     theme_few() +
-#     labs(x = 'Day of Year', y = 'Average Precipitation')
-    
-  
 ```
 
 
