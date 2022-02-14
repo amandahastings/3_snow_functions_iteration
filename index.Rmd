@@ -334,6 +334,7 @@ Bonus: Make a plot of average daily precipitation by day of year (averaged acros
 
 ```{r}
 
+<<<<<<< HEAD
 # Create plot with mean daily precip by day of year using ggplot
 
 precip_daily <- forcing_data_full %>%
@@ -371,6 +372,26 @@ precip_xts2 <- xts(precip_daily2 %>%
 dygraph(precip_xts2, ylab = "Average Daily Precipitation") %>%
   dyOptions(fillGraph = TRUE)
 
+=======
+# Create data frame with mean daily precip by day of year
+
+precip_daily <- forcing_data_full %>% 
+  group_by(month,day, site)%>% 
+  summarize(mean_precip= mean(precip, na.rm=T)) %>%
+  mutate(DoM = paste(month,day, sep= "/"))%>% 
+  pivot_wider(names_from = site,values_from=mean_precip)%>% 
+  select(-SBSP)
+
+
+# make_date 
+
+ggplot(precip_daily, aes(x = DoM, y = SASP)) +
+    geom_point(shape=1) +
+    theme_few() +
+    labs(x = 'Day of Year', y = 'Average Precipitation')
+    
+  
+>>>>>>> 02944085798f638d3e4b1f3adf5e07698227c66b
 ```
 
 
@@ -388,11 +409,16 @@ library(lubridate)
 # Write function to create yearly plots of precipitation by day of year 
 
 precip_plotter <- function(df, year) {
+<<<<<<< HEAD
   precip_daily3 <- df %>%
+=======
+  precip_daily2 <- df %>%
+>>>>>>> 02944085798f638d3e4b1f3adf5e07698227c66b
     group_by(month, day, year, site) %>%
     summarize(mean_precip = mean(precip, na.rm = T)) %>%
     mutate(date = as.Date(paste(year, month, day, sep = "/"))) %>%
     pivot_wider(names_from = site, values_from = mean_precip) %>%
+<<<<<<< HEAD
     filter(year == i) %>%
     ungroup() %>%
     select(-SBSP,-month,-day,-year)
@@ -406,6 +432,20 @@ precip_plotter <- function(df, year) {
   )
 }
 
+=======
+    select(-SBSP) %>%
+    filter (i == year)
+  
+  print(
+    ggplot(precip_daily2, aes(x = date, y = SASP)) +
+      geom_point(shape = 1) +
+      theme_few() +
+      labs(x = 'Day of Year', y = 'Average Precipitation', title = i)
+  )
+}
+
+
+>>>>>>> 02944085798f638d3e4b1f3adf5e07698227c66b
 # Use for loop to plot years 2005 to 2010
 
 yrs = c(2005:2010)
@@ -413,5 +453,21 @@ yrs = c(2005:2010)
 for (i in yrs){
   precip_plotter(forcing_data_full,year)
 }
+<<<<<<< HEAD
+=======
+
+# 
+# precip_daily2 <- forcing_data_full %>% 
+#   group_by(month,day,year,site)%>% 
+#   summarize(mean_precip= mean(precip, na.rm=T)) %>%
+#   mutate(date = as.Date(paste(year,month,day, sep= "/")))%>% 
+#   pivot_wider(names_from = site,values_from=mean_precip)%>% 
+#   select(-SBSP)
+
+# precip_xts <- xts(precip_daily2 %>%
+#                     select(SASP,-month), order.by=precip_daily2$date)
+# 
+# dygraph(precip_xts)
+>>>>>>> 02944085798f638d3e4b1f3adf5e07698227c66b
 ```
 
