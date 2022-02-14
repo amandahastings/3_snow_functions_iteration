@@ -402,7 +402,6 @@ precip_plotter <- function(df, year) {
   )
 }
 
-
 # Use for loop to plot years 2005 to 2010
 
 yrs = c(2005:2010)
