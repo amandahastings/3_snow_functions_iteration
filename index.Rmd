@@ -282,10 +282,10 @@ temp_yearly <- forcing_data_full %>%
 # Make line plot of mean temperature by year by site 
 
 ggplot(temp_yearly, aes(x=year, y=mean_yrtemp, color=site))+
-  geom_line()+ 
+  geom_line(size=.75)+ 
   theme_few()+ 
   scale_color_manual(name="Site", values= c("#58A3EB","#58E8EB"))+ 
-  labs(x='Year', y='Average Air Temperature')
+  labs(x='Year', y='Average Air Temperature (K)')
 ```
 
 
@@ -302,18 +302,46 @@ Hint: https://ggplot2.tidyverse.org/reference/print.ggplot.html
 
 # Write function to make line plots of monthly average temps per site per year
 
-
 line_plotter <- function(df, year) {
   temp_monthly <- df %>%
     group_by(year, month, site) %>%
     summarize(mean_motemp = mean(airtemp, na.rm = T)) %>%
     filter(i == year)
   
-    print(ggplot(temp_monthly, aes(x = month, y = mean_motemp, color = site)) +
-    geom_line() +
-    theme_few() +
-    labs(x = 'Month', y = 'Average Air Temperature', title = i))
-  
+  print(
+    ggplot(temp_monthly, aes(
+      x = month, y = mean_motemp, color = site
+    )) +
+      geom_line(size = .75) +
+      theme_few() +
+      scale_color_manual(name = "Site", values = c("#762448", "#B1D374")) +
+      labs(x="Month",y = 'Average Air Temperature (K)', title = i)+
+      scale_x_continuous(
+        breaks = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+        labels = c(
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December'
+        )
+      ) +
+      theme(
+        axis.text.x = element_text(
+          color = "black",
+          size = 8,
+          angle = 30,
+          vjust = .8,
+          hjust = .8
+        )
+      ))
 }
 
 # Use for loop to plot years 2005 to 2010
@@ -349,11 +377,13 @@ precip_daily <- forcing_data_full %>%
   summarize(mean_dy_precip = mean(SASP))
 
 ggplot(precip_daily, aes(x = yday, y = mean_dy_precip)) +
-    geom_point(shape=1) +
-    theme_few() +
-    labs(x = 'Day of Year', y = 'Average Precipitation')
+  geom_point(shape = 1) +
+  theme_few() +
+  labs(x = 'Day of Year', y = expression('Average Precipitation'~ ('kg'*m^2*s^1)))+
+  scale_x_continuous(breaks=c(1,90,180,270,360))
 
 # Create plot with mean daily precip by day of year using dygraphs
+# This is not averaged across available years 
 
 library(dygraphs)
 library(xts)
@@ -371,7 +401,7 @@ precip_xts2 <- xts(precip_daily2 %>%
                      select(SASP), order.by = precip_daily2$date)
 
 dygraph(precip_xts2, ylab = "Average Daily Precipitation") %>%
-  dyOptions(fillGraph = TRUE)
+  dyOptions(fillGraph = TRUE, axisLabelFontSize=10)
 
 ```
 
@@ -401,7 +431,7 @@ precip_plotter <- function(df, year) {
   
   print(
     dygraph(precip_xts3, main = i, ylab = "Average Daily Precipitation") %>%
-      dyOptions(fillGraph = TRUE)
+      dyOptions(fillGraph = TRUE, axisLabelFontSize=10)
   )
 }
 
