@@ -455,6 +455,9 @@ for (i in yrs){
 
 #### Function using dygraphs
 
+This will print the plots in the console/inline and the document will knit. However, the dygraphs plots do not show up in the final document. 
+
+
 ```{r dygraphs, yearly precip plots}
 
 # Write function to create yearly plots of precipitation by day of year with dygraphs
