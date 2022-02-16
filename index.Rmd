@@ -412,11 +412,54 @@ Bonus #2: Use a function and for loop to create yearly plots of precipitation by
 
 ### Create yearly plots of precip by day of year 
 
-```{r}
+#### Function using ggplot 
 
-# Write function to create yearly plots of precipitation by day of year 
+```{r ggplot, yearly precip plot}
 
-precip_plotter <- function(df, year) {
+# Write a function to create yearly plots for precip by day of year with ggplot
+
+precip_plotter2 <- function(df, year) {
+  precip_daily4 <- df %>%
+    group_by(month, day, year, site) %>%
+    summarize(mean_precip = mean(precip, na.rm = T)) %>%
+    mutate(date = as.Date(paste(year, month, day, sep = "/"))) %>%
+    mutate(yday = yday(date)) %>%
+    pivot_wider(names_from = site, values_from = mean_precip) %>%
+    select(-SBSP) %>%
+    filter(year == i)
+  
+  print(
+    ggplot(precip_daily4, aes(x = yday, y = SASP)) +
+      geom_point(shape = 1) +
+      theme_few() +
+      labs(
+        title = i,
+        x = 'Day of Year',
+        y = expression('Average Precipitation' ~ ('kg' *
+                                                    m ^ 2 * s ^ 1))
+      ) +
+      scale_x_continuous(breaks = c(1, 90, 180, 270, 360))
+  )
+}
+
+# Use for loop to plot years 2005 to 2010
+
+yrs = c(2005:2010)
+
+for (i in yrs){
+  precip_plotter2(forcing_data_full,year)
+}
+
+```
+
+
+#### Function using dygraphs
+
+```{r dygraphs, yearly precip plots}
+
+# Write function to create yearly plots of precipitation by day of year with dygraphs
+
+dy_precip_plotter <- function(df, year) {
   precip_daily3 <- df %>%
     group_by(month, day, year, site) %>%
     summarize(mean_precip = mean(precip, na.rm = T)) %>%
@@ -440,8 +483,7 @@ precip_plotter <- function(df, year) {
 yrs = c(2005:2010)
  
 for (i in yrs){
-  precip_plotter(forcing_data_full,year)
+  dy_precip_plotter(forcing_data_full,year)
 }
-
 ```
 
